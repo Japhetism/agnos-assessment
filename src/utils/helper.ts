@@ -11,3 +11,14 @@ export const clearData = () => {
 };
 
 export const htmlParser = (string: string) => parse(string);
+
+export const formatAPIResponse = (data: any) => {
+  return {
+    responseCode: 0,
+    data: data
+  }
+}
+
+export const formatCurrency = (value: number) => {
+  return value.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+}

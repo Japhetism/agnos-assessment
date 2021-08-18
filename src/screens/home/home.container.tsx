@@ -9,7 +9,12 @@ export const HomeContainer = () => {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
-  const [order, setOrder] = useState([]);
+  const [orders, setOrders] = useState<any>([]);
+  const [openModal, setOpenModal] = useState(false);
+  const [subtotal, setSubtotal] = useState(0);
+  const [tax, setTax] = useState(0)
+  const [discount, setDiscount] = useState(0);
+  const [grandtotal, setGrandtotal] = useState(0);
 
   useEffect(() => {
     setIsLoading(true);
@@ -17,7 +22,6 @@ export const HomeContainer = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    console.log("default state is ", defaultState)
     const allProducts = defaultState?.productsResponse?.products?.data;
     const loading = defaultState?.productsResponse?.loading;
     const hasError = defaultState?.productsResponse?.error;
@@ -29,5 +33,32 @@ export const HomeContainer = () => {
     }, 1000);
   }, [defaultState]);
 
-  return <HomeView products={products} />;
+  const addToOrder = (product: any, quantity: number) => {
+    product.quantity = quantity;
+    const previousOrder: any[] = orders;
+    previousOrder.push(product);
+    const accumulatedSubtotal = subtotal + (product.price * quantity)
+    const accumulatedTax = tax + ((product.tax / 100) * (product.price * quantity))
+    const accumulatedDiscount = product.discount ? discount + ((discount / 100) * (product.price * quantity)) : 0;
+    const accumulatedGrandtotal = accumulatedSubtotal + accumulatedTax - accumulatedDiscount;
+    setTimeout(() => {
+      setOrders((previousOrder: any) => previousOrder)
+      setSubtotal(accumulatedSubtotal)
+      setTax(accumulatedTax)
+      setGrandtotal(accumulatedGrandtotal)
+      setDiscount(accumulatedDiscount)
+      setOpenModal(false);
+    }, 5000);
+  }
+
+  return <HomeView 
+    products={products} 
+    orders={orders} 
+    addToOrder={addToOrder} 
+    openModal={openModal} 
+    discount={discount}
+    subtotal={subtotal}
+    tax={tax}
+    grandtotal={grandtotal}
+  />;
 };
